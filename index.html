@@ -59,7 +59,7 @@
     }
 
     
-button {
+a {
   padding: 10px 24px;
   margin-left: 10px;
   font-size: 14px;
@@ -71,12 +71,12 @@ button {
   transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-button:hover {
+a:hover {
   background-color: #d5d5d5;
   box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
 }
 
-button:active {
+a:active {
   background-color: #cfcfcf;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
@@ -192,12 +192,10 @@ function renderBookTable(books) {
   table.appendChild(tbody);
 }
 function createDownloadButton(book, file) {
-  var downloadButton = document.createElement("button");
+  var downloadButton = document.createElement("a");
   downloadButton.href = book.url;
   downloadButton.target = "_blank";
-  downloadButton.addEventListener("click", function (e) {
-    fetchFileAndDecrpyt(book, file);
-  });
+  
   downloadButton.appendChild(document.createTextNode("Download " + file.type));
   return downloadButton;
 }
