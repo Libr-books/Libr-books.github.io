@@ -225,21 +225,13 @@ function downloadDecrypted(content, filename, type) {
   } else if (type === 'mobi') {
     mimeType = 'application/x-mobipocket-ebook';
   }
+  var blob = new Blob([content], {type: mimeType});
+        var url = URL.createObjectURL(blob);
 
-  // Encode content as base64
-  var base64Data = btoa(content);
-
-  // Create Data URI
-  var dataUri = 'data:' + mimeType + ';base64,' + base64Data;
-
-  // Create a download link and click it
-  var a = document.createElement('a');
-  a.href = dataUri;
-  a.download = filename;
-
-  document.body.appendChild(a); // Required in Firefox
-  a.click();
-  document.body.removeChild(a);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click(); 
 }
 function get(url, callback) {
   var xhr = new XMLHttpRequest();
