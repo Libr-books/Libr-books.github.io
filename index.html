@@ -116,7 +116,7 @@ function File(type, url){
     var rawData = [];
     get("./static/books.json", function(error, data){
         if(data){
-            var rawBooks = JSON.parse(jsonString);
+            var rawBooks = JSON.parse(data);
 
             // Map raw objects into Book instances with File instances inside
             rawData = rawBooks.map(function(rawBook) {
