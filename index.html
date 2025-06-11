@@ -99,123 +99,125 @@ button:active {
       </div> 
 
   <script type="text/javascript">
+function File(type, url) {
+  this.type = type;
+  this.url = url;
+}
 
-function File(type, url){
-        this.type = type;
-        this.url = url;
-    }
+// Book constructor (schema)
+function Book(name, author, files) {
+  this.name = name;
+  this.author = author;
+  this.files = files;
+}
 
-    // Book constructor (schema)
-    function Book(name, author, files) {
-      this.name = name;
-      this.author = author;
-      this.files = files;
-    }
+// Example raw data (JSON-like)
+var rawData = [];
+get("./static/books.json", function (error, data) {
+  if (data) {
+    var rawBooks = JSON.parse(data);
 
-    // Example raw data (JSON-like)
-    var rawData = [];
-    get("./static/books.json", function(error, data){
-        if(data){
-            var rawBooks = JSON.parse(data);
+    // Map raw objects into Book instances with File instances inside
+    rawData = rawBooks.map(function (rawBook) {
+      // Convert raw files array into File instances
+      var files = rawBook.files.map(function (rawFile) {
+        return new File(rawFile.type, rawFile.url);
+      });
 
-            // Map raw objects into Book instances with File instances inside
-            rawData = rawBooks.map(function(rawBook) {
-                // Convert raw files array into File instances
-                var files = rawBook.files.map(function(rawFile) {
-                    return new File(rawFile.type, rawFile.url);
-                });
-            
-                // Create and return a new Book instance
-                return new Book(rawBook.name, rawBook.author, files);
-            });
-        }
-
+      // Create and return a new Book instance
+      return new Book(rawBook.name, rawBook.author, files);
     });
+  }
+});
 
+// Render table
+function renderBookTable(books) {
+  var table = document.getElementById("table");
+  var tbody = document.getElementById("tbody");
+  for (var j = 0; j < books.length; j++) {
+    var book = books[j];
+    var row = document.createElement("tr");
+    var nameCell = document.createElement("td");
+    nameCell.appendChild(document.createTextNode(book.name));
+    row.appendChild(nameCell);
+    var authorCell = document.createElement("td");
+    authorCell.appendChild(document.createTextNode(book.author));
+    row.appendChild(authorCell);
+    var urlCell = document.createElement("td");
+    book.files.forEach(function (f) {
+      var b = createDownloadButton(book, f);
+      urlCell.appendChild(b);
+    });
+    row.appendChild(urlCell);
+    tbody.appendChild(row);
+  }
+  table.appendChild(tbody);
+}
+function createDownloadButton(book, file) {
+  var downloadButton = document.createElement("button");
+  downloadButton.href = book.url;
+  downloadButton.target = "_blank";
+  downloadButton.addEventListener("click", function (e) {
+    fetchFileAndDecrpyt(book, file);
+  });
+  downloadButton.appendChild(document.createTextNode("Download " + file.type));
+  return downloadButton;
+}
+function fetchFileAndDecrpyt(book, file) {
+  get(file.url, function (err, data) {
+    if (err) {
+      console.error(err);
+    } else {
+      downloadDecrypted(
+        data,
+        (book.name + "_by_" + book.author).replaceAll(" ", "_") +
+          "." +
+          file.type
+      );
+    }
+  });
+}
 
-    // Render table
-    function renderBookTable(books) {
-      var table = document.getElementById("table");
-      var container = document.getElementById("bookTableContainer");      
+// call this when you try to download the file
+function downloadDecrypted(content, filename, type) {
+  var mimeType = 'application/octet-stream';
 
-      var tbody = document.getElementById("tbody");
+  if (type === 'epub') {
+    mimeType = 'application/epub+zip';
+  } else if (type === 'mobi') {
+    mimeType = 'application/x-mobipocket-ebook';
+  }
 
-      for (var j = 0; j < books.length; j++) {
-        var book = books[j];
-        var row = document.createElement("tr");        
+  // Encode content as base64
+  var base64Data = btoa(content);
 
-        var nameCell = document.createElement("td");
-        nameCell.appendChild(document.createTextNode(book.name));
-        row.appendChild(nameCell);
+  // Create Data URI
+  var dataUri = 'data:' + mimeType + ';base64,' + base64Data;
 
-        var authorCell = document.createElement("td");
-        authorCell.appendChild(document.createTextNode(book.author));
-        row.appendChild(authorCell);
+  // Create a download link and click it
+  var a = document.createElement('a');
+  a.href = dataUri;
+  a.download = filename;
 
-        var urlCell = document.createElement("td");
-
-        book.files.forEach(function (f){
-            var b = createDownloadButton(book, f);
-            urlCell.appendChild(b);
-        })
-
-        row.appendChild(urlCell);
-
-        tbody.appendChild(row);
+  document.body.appendChild(a); // Required in Firefox
+  a.click();
+  document.body.removeChild(a);
+}
+function get(url, callback) {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", url, true);
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        callback(null, xhr.responseText);
+      } else {
+        callback(new Error("Request failed: " + xhr.statusText));
       }
-
-      table.appendChild(tbody);      
-    } 
-    
-    function createDownloadButton(book, file){
-        var downloadButton = document.createElement("button");
-        downloadButton.href = book.url;
-        downloadButton.target = "_blank";
-                
-        downloadButton.addEventListener("click", function(e) {               
-            fetchFileAndDecrpyt(book, file);
-        })
-        downloadButton.appendChild(document.createTextNode("Download " + file.type));
-        return downloadButton;
     }
+  };
+  xhr.send();
+}
 
-    function fetchFileAndDecrpyt(book, file){
-        get(file.url, 
-            function(err, data) {
-                if (err) {
-                    console.error(err);
-                } else {
-                    downloadDecrypted(data, (book.name + '_by_' + book.author).replaceAll(" ", "_") + "." + file.type)
-                }
-            }
-        );
-    }
-
-    // call this when you try to download the file
-    function downloadDecrypted(content, filename) {
-        var blob = new Blob([content], {type: 'application/octet-stream'});
-        var url = URL.createObjectURL(blob);
-
-        var a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        a.click();        
-    }
-    
-    function get(url, callback) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', url, true);
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-                callback(null, xhr.responseText);
-            } else {
-                callback(new Error('Request failed: ' + xhr.statusText));
-            }
-            }
-        };
-        xhr.send();
-    }
   </script>
 </body>
 </html>
