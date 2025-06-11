@@ -193,25 +193,23 @@ function renderBookTable(books) {
 }
 function createDownloadButton(book, file) {
   var downloadButton = document.createElement("a");
-  downloadButton.href = book.url;
+  downloadButton.href = file.url;
   downloadButton.target = "_blank";
-  
+  downloadButton.download = getFileName(book, file);
+  downloadButton.type = getMimeType(file);
   downloadButton.appendChild(document.createTextNode("Download " + file.type));
   return downloadButton;
 }
-function fetchFileAndDecrpyt(book, file) {
-  get(file.url, function (err, data) {
-    if (err) {
-      showErrorBox(err.message)
-    } else {
-      downloadDecrypted(
-        data,
-        (book.name + "_by_" + book.author).replaceAll(" ", "_") +
+
+function getFileName(book, file){
+  return (book.name + "_by_" + book.author).replaceAll(" ", "_") +
           "." +
           file.type
-      );
-    }
-  });
+}
+
+function getMimeType(file){  
+  var ext = file.type.replace(/^\./, '').toLowerCase();
+  mimeTypes[ext] || 'application/octet-stream';
 }
 
 // call this when you try to download the file
@@ -269,6 +267,30 @@ function showErrorBox(message) {
     showErrorBox(info);
     return false; // Let browser handle too
   };
+
+  var mimeTypes = {
+        // EPUB formats
+        'epub': 'application/epub+zip',
+        
+        // Kindle/Mobipocket formats
+        'mobi': 'application/x-mobipocket-ebook',
+        'prc': 'application/x-mobipocket-ebook',
+        'azw': 'application/vnd.amazon.ebook',
+        'azw3': 'application/vnd.amazon.ebook',
+        'azw4': 'application/vnd.amazon.ebook',
+        
+        // PDF
+        'pdf': 'application/pdf',
+                
+        // Text formats
+        'txt': 'text/plain',
+        'rtf': 'application/rtf',
+                
+        // Word processing formats
+        'doc': 'application/msword',
+        'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'odt': 'application/vnd.oasis.opendocument.text'        
+    };
 
   </script>
 </body>
