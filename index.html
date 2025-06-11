@@ -114,7 +114,7 @@ function File(type, url){
 
     // Example raw data (JSON-like)
     var rawData = [];
-    get("https://github.com/Libr-books/static/raw/refs/heads/main/books.json", function(error, data){
+    get("./static/books.json", function(error, data){
         if(data){
             var rawBooks = JSON.parse(jsonString);
 
