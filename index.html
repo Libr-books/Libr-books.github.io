@@ -160,7 +160,7 @@ get("./static/books.json", function (error, data) {
       });
 
       // Create and return a new Book instance
-      return new Book(rawBook.name, rawBook.author, files);
+      return new Book(atob(rawBook.name), atob(rawBook.author), files);
     });
   }
   else{
