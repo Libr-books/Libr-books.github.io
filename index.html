@@ -163,6 +163,9 @@ get("./static/books.json", function (error, data) {
       return new Book(rawBook.name, rawBook.author, files);
     });
   }
+  else{
+    showErrorBox(error);
+  }
 });
 
 // Render table
@@ -201,7 +204,7 @@ function createDownloadButton(book, file) {
 function fetchFileAndDecrpyt(book, file) {
   get(file.url, function (err, data) {
     if (err) {
-      console.error(err);
+      showErrorBox(err.message)
     } else {
       downloadDecrypted(
         data,
