@@ -205,10 +205,13 @@ function renderBookTable(books) {
     authorCell.appendChild(document.createTextNode(book.author));
     row.appendChild(authorCell);
     var urlCell = document.createElement("td");
-    book.files.forEach(function (f) {
+
+    for (var i = 0; i < book.files.length; i++) {
+      var f = book.files[i];
       var b = createDownloadButton(book, f);
       urlCell.appendChild(b);
-    });
+    }
+
     row.appendChild(urlCell);
     tbody.appendChild(row);
   }
@@ -235,23 +238,7 @@ function getMimeType(file){
   mimeTypes[ext] || 'application/octet-stream';
 }
 
-// call this when you try to download the file
-function downloadDecrypted(content, filename, type) {
-  var mimeType = 'application/octet-stream';
 
-  if (type === 'epub') {
-    mimeType = 'application/epub+zip';
-  } else if (type === 'mobi') {
-    mimeType = 'application/x-mobipocket-ebook';
-  }
-  var blob = new Blob([content], {type: mimeType});
-        var url = URL.createObjectURL(blob);
-
-        var a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        a.click(); 
-}
 function get(url, callback) {
   var xhr = new XMLHttpRequest();
   xhr.open("GET", url, true);
