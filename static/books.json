@@ -1,11 +1,52 @@
 [
-    {
-        "name":"VWx5c3Nlcw==",
-        "author":"SmFtZXMgSm95Y2U=",
-        "files":
-        [
-            {"type":"epub","url":"./files/f2496129-9dd8-41fa-8c3f-497fbeabdc8b"}
-        ]            
-    }
+  {
+    "name": "VWx5c3Nlcw==",
+    "author": "SmFtZXMgSm95Y2U=",
+    "files": [
+      {
+        "type": "epub",
+        "url": "./files/f2496129-9dd8-41fa-8c3f-497fbeabdc8b"
+      }
+    ]
+  },
+  {
+    "name": "UmV0cmlidXRpb24=",
+    "author": "U2FyYWggQmFycmll",
+    "files": [
+      {
+        "type": ".epub",
+        "url": "./files/46df27e6-ab39-430f-b83d-058c1bf5faae"
+      }
+    ]
+  },
+  {
+    "name": "RW5kR2FtZQ==",
+    "author": "U2FyYWggQmFycmll",
+    "files": [
+      {
+        "type": ".epub",
+        "url": "./files/f0fd5682-e8b0-477f-b6c6-c538bddaf35a"
+      }
+    ]
+  },
+  {
+    "name": "VmVuZGV0dGE=",
+    "author": "U2FyYWggQmFycmll",
+    "files": [
+      {
+        "type": ".epub",
+        "url": "./files/a0da37a7-0fcf-4498-9ed5-85dff41a4aae"
+      }
+    ]
+  },
+  {
+    "name": "VW5mb3JnaXZlbg==",
+    "author": "U2FyYWggQmFycmll",
+    "files": [
+      {
+        "type": ".epub",
+        "url": "./files/738f15d0-eef5-419c-99fa-4c8094c662ab"
+      }
+    ]
+  }
 ]
-    
