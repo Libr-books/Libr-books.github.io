@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Persistent JS REPL</title>
+  <style>
+    body {
+      font-family: monospace;
+      background: #f0f0f0;
+      color: #000;
+      padding: 1em;
+    }
+    input, textarea, button {
+      font-family: monospace;
+      background: #fff;
+      color: #000;
+      border: 1px solid #000;
+      padding: 0.5em;
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 0.5em;
+    }
+    #log, #codeView {
+      background: #fff;
+      border: 1px solid #000;
+      padding: 1em;
+      white-space: pre-wrap;
+      overflow-y: auto;
+      max-height: 200px;
+    }
+    button {
+      width: 130px;
+      display: inline-block;
+      margin-right: 0.5em;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Persistent JS REPL</h2>
+
+<input id="repl" placeholder="Type JS and press Enter" autofocus />
+<button id="historyUp">Previous</button>
+<button id="historyDown">Next</button>
+<button id="addScript">Add To Context</button>
+
+<div id="log"></div>
+
+<h3>All Added Code</h3>
+<textarea id="codeView" readonly style="height: auto;"></textarea>
+
+<script>
+(function () {
+  var replInput = document.getElementById('repl');
+  var addButton = document.getElementById('addScript');
+  var historyDownButton = document.getElementById('historyDown');
+  var historyUpButton = document.getElementById('historyUp');
+  var logDiv = document.getElementById('log');
+  var codeView = document.getElementById('codeView');
+
+  var history = [];
+  var historyIndex = -1;
+  var allCode = [];
+
+  function logResult(input, output) {
+    var entry = '> ' + input + '\n' + (output !== undefined ? String(output) : '');
+    logDiv.innerHTML = entry + '\n' + logDiv.innerHTML;
+    logDiv.scrollTop = logDiv.scrollHeight;
+  }
+
+  function evaluate(code) {
+    var result;
+    try {
+      result = eval(code);
+    } catch (err) {
+      result = 'Error: ' + err.message;
+    }
+    logResult(code, result);
+  }
+
+  function addScriptToPage(code) {
+    var script = document.createElement('script');
+    script.text = code;
+    document.body.appendChild(script);
+    allCode.push(code);
+    codeView.value = allCode.join('\n\n');
+    codeView.scrollTop = codeView.scrollHeight;
+    codeView.rows = allCode.length;
+  }
+
+  // Handle input enter
+  replInput.addEventListener('keydown', function (e) {
+    var key = e.keyCode || e.which;
+
+    if (key === 13) { // Enter
+      var code = replInput.value;
+      if (code.trim()) {
+        evaluate(code);
+        history.push(code);
+        historyIndex = history.length;
+        replInput.value = '';
+      }
+      e.preventDefault();
+    } else if (key === 38) { // Arrow up
+      historyUp();
+      e.preventDefault();
+    } else if (key === 40) { // Arrow down
+      historyDown()
+      e.preventDefault();
+    }
+  });
+
+  var historyUp = function(){
+    if (historyIndex > 0) {
+        historyIndex--;
+        replInput.value = history[historyIndex];
+      }
+  };
+
+  var historyDown = function(){
+    if (historyIndex < history.length - 1) {
+        historyIndex++;
+        replInput.value = history[historyIndex];
+      } else {
+        historyIndex = history.length;
+        replInput.value = '';
+      }
+  };
+
+  historyDownButton.addEventListener('click', function() {
+    historyDown();
+  });
+
+  historyUpButton.addEventListener('click', function() {
+    historyUp();
+});
+
+  // Handle "Add Permanently" button
+  addButton.addEventListener('click', function () {
+    var code = replInput.value;
+    if (code.trim()) {
+      addScriptToPage(code);
+      logResult('Persisted: ' + code, '');
+      replInput.value = '';
+    }
+  });
+
+  window.onerror = function (msg, url, line, col, error){
+    
+  } 
+})();
+</script>
+
+</body>
+</html>
