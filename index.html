@@ -366,7 +366,7 @@ var renderBookTable = logs.wrap(function(books) {
 var createDownloadButton = logs.wrap(function(book, file) {
   var downloadButton = document.createElement("a");
   downloadButton.href = file.url;
-  downloadButton.target = "_blank";
+  //downloadButton.target = "_blank";
   downloadButton.download = getFileName(book, file);
   downloadButton.type = getMimeType(file);
   downloadButton.appendChild(document.createTextNode("Download " + file.type));
