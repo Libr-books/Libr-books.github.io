@@ -64,8 +64,7 @@
 
   function logResult(input, output) {
     var entry = '> ' + input + '\n' + (output !== undefined ? String(output) : '');
-    logDiv.innerHTML = entry + '\n' + logDiv.innerHTML;
-    logDiv.scrollTop = logDiv.scrollHeight;
+    logDiv.innerHTML = entry + '\n' + logDiv.innerHTML;    
   }
 
   function evaluate(code) {
@@ -83,8 +82,7 @@
     script.text = code;
     document.body.appendChild(script);
     allCode.push(code);
-    codeView.value = allCode.join('\n\n');
-    codeView.scrollTop = codeView.scrollHeight;
+    codeView.value = allCode.join('\n\n');    
     codeView.rows = allCode.length;
   }
 
@@ -146,7 +144,7 @@
   });
 
   window.onerror = function (msg, url, line, col, error){
-    
+
   } 
 })();
 </script>
