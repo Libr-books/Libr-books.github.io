@@ -153,10 +153,153 @@ button:active {
       </div> 
       <div id="errorBox" style="display:none;">
         <div id="errorContent"></div>
+        <div id="debugContent"></div>
+        <button id="showDebugBtn" onclick="showDebug()">Show debug</button>
         <button id="errorCloseBtn" onclick="hideErrorBox()">Close</button>
       </div>
-      
-  <script type="text/javascript">
+      <script type="text/javascript">  
+        function createDebugStore() {
+           var root = { name: 'root', children: [], logs: [] };
+           var currentContext = root;
+     
+           function createContext(name, args) {
+             return {
+               name: name,
+               args: args,
+               children: [],
+               logs: [],
+               parent: null
+             };
+           }
+     
+           function enterContext(name, args) {
+             var ctx = createContext(name, args);
+             ctx.parent = currentContext;
+             currentContext.children.push(ctx);
+             currentContext = ctx;
+           }
+     
+           function exitContext() {
+             if (currentContext.parent) {
+               currentContext = currentContext.parent;
+             }
+           }
+     
+           function log(message, meta) {
+             currentContext.logs.push({
+               timestamp: new Date().toISOString(),
+               message: message,
+               meta: meta || null
+             });
+           }
+
+           function cloneWithoutParent(node) {
+              var clean = {
+                name: node.name,
+                args: node.args,
+                logs: node.logs.slice(),
+                children: []
+              };
+              for (var i = 0; i < node.children.length; i++) {
+                clean.children.push(cloneWithoutParent(node.children[i]));
+              }
+              return clean;
+            }
+
+            function buildLogTreeString(node, depth) {
+              var indent = Array(depth + 1).join('  ');
+              var name = node.name;
+              var args = node.args && node.args.length
+                ? '(' + node.args.map(function(arg) {
+                    return JSON.stringify(arg);
+                  }).join(', ') + ')'
+                : '';
+              var output = indent + '- ' + name + args + '<br />';
+
+              for (var i = 0; i < node.logs.length; i++) {
+                var log = node.logs[i];
+                output += indent + '  * ' + log.timestamp + ' — ' + log.message + '<br />';
+              }
+
+              for (var j = 0; j < node.children.length; j++) {
+                output += buildLogTreeString(node.children[j], depth + 1);
+              }
+
+              return output;
+            }
+
+            function _toHtmlString(node, currentDepth){              
+              if(!currentDepth){
+                currentContext = 0;
+              }
+              var indent = Array(currentDepth + 1).join('  ');
+              var name = node.name;
+              var args = node.args && node.args.length
+                ? '(' + node.args.map(function(arg) {
+                    return JSON.stringify(arg);
+                  }).join(', ') + ')'
+                : '';
+              var output = '<span> <pre>' + indent + '- ' + name + args + '</ pre></span>';
+
+              for (var i = 0; i < node.logs.length; i++) {
+                var log = node.logs[i];
+                output += '<span> <pre>' + indent + '  * ' + log.timestamp + ' — ' + log.message + '</ pre></span>';
+              }
+
+              for (var j = 0; j < node.children.length; j++) {
+                output += _toHtmlString(node.children[j], currentDepth + 1);
+              }
+
+              return output;
+            }
+     
+           return {
+             wrap: function(fn, name) {
+               return function() {
+                 var args = Array.prototype.slice.call(arguments);
+                 enterContext(name || fn.name || 'anonymous', args);
+                 try {
+                   return fn.apply(this, args);
+                 } finally {
+                   exitContext();
+                 }
+               };
+             },
+             log: log,
+             getTree: function(depth) {
+              if(!depth){
+                depth = 4;
+              }
+              return buildLogTreeString(cloneWithoutParent(root), depth);
+             },
+             toHtmlString: function(){
+              return _toHtmlString(cloneWithoutParent(root), 0);
+             },
+             reset: function() {
+               root = { name: 'root', children: [], logs: [] };
+               currentContext = root;
+             }
+           };
+         }
+           
+var logs = createDebugStore();
+
+var get = logs.wrap(function(url, callback) {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", url, true);
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        callback(null, xhr.responseText);
+      } else {
+        callback(new Error("Request failed: " + xhr.statusText));
+      }
+    }
+  };
+  xhr.send();
+}, "get");
+
+
 function File(type, url) {
   this.type = type;
   this.url = url;
@@ -192,7 +335,7 @@ get("./static/books.json", function (error, data) {
 });
 
 // Render table
-function renderBookTable(books) {
+var renderBookTable = logs.wrap(function(books) {
   var table = document.getElementById("table");
   var tbody = document.getElementById("tbody");
   for (var j = 0; j < books.length; j++) {
@@ -205,8 +348,9 @@ function renderBookTable(books) {
     authorCell.appendChild(document.createTextNode(book.author));
     row.appendChild(authorCell);
     var urlCell = document.createElement("td");
-
+    
     for (var i = 0; i < book.files.length; i++) {
+      logs.log("book files to be rendered", books.files)
       var f = book.files[i];
       var b = createDownloadButton(book, f);
       urlCell.appendChild(b);
@@ -216,8 +360,10 @@ function renderBookTable(books) {
     tbody.appendChild(row);
   }
   table.appendChild(tbody);
-}
-function createDownloadButton(book, file) {
+},
+"renderBookTable");
+
+var createDownloadButton = logs.wrap(function(book, file) {
   var downloadButton = document.createElement("a");
   downloadButton.href = file.url;
   downloadButton.target = "_blank";
@@ -225,49 +371,42 @@ function createDownloadButton(book, file) {
   downloadButton.type = getMimeType(file);
   downloadButton.appendChild(document.createTextNode("Download " + file.type));
   return downloadButton;
-}
+},"createDownloadButton");
 
-function getFileName(book, file){
+var getFileName = logs.wrap(function (book, file){
   return (book.name + "_by_" + book.author).replaceAll(" ", "_") +
           "." +
           file.type
-}
+},"getFileName");
 
-function getMimeType(file){  
+var getMimeType = logs.wrap(function (file){  
   var ext = file.type.replace(/^\./, '').toLowerCase();
   mimeTypes[ext] || 'application/octet-stream';
-}
-
-
-function get(url, callback) {
-  var xhr = new XMLHttpRequest();
-  xhr.open("GET", url, true);
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState === 4) {
-      if (xhr.status === 200) {
-        callback(null, xhr.responseText);
-      } else {
-        callback(new Error("Request failed: " + xhr.statusText));
-      }
-    }
-  };
-  xhr.send();
-}
+}, "getMimeType");
 
 function showErrorBox(message) {
     var errorBox = document.getElementById('errorBox');
     var errorContent = document.getElementById('errorContent');
     errorContent.innerHTML = message;
-    errorBox.style.display = 'block';
+    errorBox.style.display = 'block';    
+  }
+ 
+  function showDebug(){
+    var debugContent = document.getElementById('debugContent');
+    debugContent.style.display = 'block';
+    debugContent.innerHTML = logs.toHtmlString();
   }
 
   function hideErrorBox() {
     var errorBox = document.getElementById('errorBox');
     errorBox.style.display = 'none';
+
+    var debugContent = document.getElementById('debugContent');
+    debugContent.style.display = 'none';
   }
 
   // Optional: catch global errors
-  window.onerror = function (msg, url, line, col, error) {
+  window.onerror = logs.wrap(function (msg, url, line, col, error) {
     var info = 'JS Error: ' + msg + '\n' +
                'Line: ' + line + ', Column: ' + (col || '-') + '\n' +
                'URL: ' + (url || '-') + '\n';
@@ -276,7 +415,7 @@ function showErrorBox(message) {
     }
     showErrorBox(info);
     return false; // Let browser handle too
-  };
+  },"window.onerror");
 
   var mimeTypes = {
         // EPUB formats
@@ -301,7 +440,7 @@ function showErrorBox(message) {
         'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'odt': 'application/vnd.oasis.opendocument.text'        
     };
-
   </script>
+  
 </body>
 </html>
