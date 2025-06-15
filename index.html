@@ -374,7 +374,7 @@ var createDownloadButton = logs.wrap(function(book, file) {
 },"createDownloadButton");
 
 var getFileName = logs.wrap(function (book, file){
-  return (book.name + "_by_" + book.author).replaceAll(" ", "_") +
+  return (book.name + "_by_" + book.author).replace(/ /g, "_") +
           "." +
           file.type
 },"getFileName");
