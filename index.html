@@ -428,9 +428,7 @@ if (isCompatible()) {
     }, "createDownloadButton");
 
     var getFileName = logs.wrap(function(book, file) {
-        return (book.name + "_by_" + book.author).replace(/ /g, "_") +
-            "." +
-            file.type
+        return (book.name + "_by_" + book.author).replace(/ /g, "_") + file.type
     }, "getFileName");
 
     var getMimeType = logs.wrap(function(file) {
