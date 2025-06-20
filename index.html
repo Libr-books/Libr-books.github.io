@@ -319,8 +319,9 @@ if (isCompatible()) {
 
     var logs = createDebugStore();
 
-    var get = logs.wrap(function(url, callback) {
+    var get = logs.wrap(function(url, responseType, callback) {
         var xhr = new XMLHttpRequest();
+        xhr.responseType = responseType;
         xhr.open("GET", url, true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4) {
@@ -336,7 +337,7 @@ if (isCompatible()) {
 
     // Example raw data (JSON-like)
     var rawData = [];
-    get("./static/books.json", function(error, data) {
+    get("./static/books.json", 'json', function(error, data) {
         if (data) {
             var rawBooks = JSON.parse(data);
 
@@ -384,12 +385,44 @@ if (isCompatible()) {
         },
         "renderBookTable");
 
+   var getBook = logs.wrap(function(fileName, url, mimeType) {
+    // Fetch the file data (assuming file.url is a direct link to the file)
+      var downloadButton = document.createElement("a");
+      get(url, 'arraybuffer', function(err, data){
+        if(err){
+          logs.log(err);
+          showErrorBox();
+        }
+        else{
+            var arrayBuffer = data.response;
+            var blob = new Blob([arrayBuffer], { type: mimeType });
+            var blobUrl = window.URL.createObjectURL(blob);
+    
+            // Create a temporary link to trigger the download
+            var a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = fileName
+            document.body.appendChild(a);
+            a.click();
+    
+            // Cleanup
+            setTimeout(function () {
+              document.body.removeChild(a);
+              window.URL.revokeObjectURL(blobUrl);
+            }, 100);
+        }    
+  })}, "createDownloadButton");
+
+
     var createDownloadButton = logs.wrap(function(book, file) {
-        var downloadButton = document.createElement("a");
-        downloadButton.href = file.url;
+        var downloadButton = document.createElement("button");
+        downloadButton.dataset.url = file.url;
         //downloadButton.target = "_blank";
-        downloadButton.download = getFileName(book, file);
-        downloadButton.type = getMimeType(file);
+        downloadButton.dataset.fileName = getFileName(book, file);
+        downloadButton.dataset.mimeType = getMimeType(file);
+        downloadButton.addEventListener('click', function(e){
+          getBook(this.dataset.fileName, this.dataset.url, this.dataset.mimeType)
+        });
         downloadButton.appendChild(document.createTextNode("Download " + file.type));
         return downloadButton;
     }, "createDownloadButton");
