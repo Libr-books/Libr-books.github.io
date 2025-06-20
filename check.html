@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Libr - compatability report</title>  
+</head>
+    <body>
+        <div id="compat-report">
+
+        </div>
+        <script type="text/javascript">
+            function checkXHRBlobCompatibility() {
+            var report = [];
+
+            // Check XMLHttpRequest
+            if (typeof XMLHttpRequest !== 'undefined') {
+                report.push('✅ XMLHttpRequest is supported.');
+            } else {
+                report.push('❌ XMLHttpRequest is NOT supported.');
+                logReport(report);
+                return;
+            }
+
+            // Try creating XHR instance
+            var xhr;
+            try {
+                xhr = new XMLHttpRequest();
+            } catch (e) {
+                report.push('❌ Failed to create XMLHttpRequest instance.');
+                logReport(report);
+                return;
+            }
+
+            // Check responseType support
+            var typesToTest = ['blob', 'arraybuffer', 'json', 'document'];
+            for (var i = 0; i < typesToTest.length; i++) {
+                var type = typesToTest[i];
+                try {
+                xhr.responseType = type;
+                if (xhr.responseType === type) {
+                    report.push('✅ responseType "' + type + '" is supported.');
+                } else {
+                    report.push('❌ responseType "' + type + '" is NOT supported.');
+                }
+                } catch (e) {
+                report.push('❌ Setting responseType "' + type + '" threw an error.');
+                }
+            }
+
+            // Check Blob constructor support
+            try {
+                var testBlob = new Blob(['test'], { type: 'text/plain' });
+                if (testBlob && typeof testBlob === 'object' && typeof testBlob.size !== 'undefined') {
+                report.push('✅ Blob constructor is supported.');
+                } else {
+                report.push('❌ Blob constructor does NOT return a valid Blob.');
+                }
+            } catch (e) {
+                report.push('❌ Blob constructor is NOT supported.');
+            }
+
+            // Check URL.createObjectURL support
+            if (window.URL && typeof window.URL.createObjectURL === 'function') {
+                report.push('✅ URL.createObjectURL is supported.');
+            } else {
+                report.push('❌ URL.createObjectURL is NOT supported.');
+            }
+
+              logReport(report);
+            }
+
+            // Helper function for consistent output
+            function logReport(lines) {
+                // Try to get or create a container div
+                var container = document.getElementById('compat-report');
+                if (!container) {
+                    container = document.createElement('div');
+                    container.id = 'compat-report';
+                    container.style.fontFamily = 'monospace';
+                    container.style.whiteSpace = 'pre';
+                    container.style.padding = '10px';
+                    container.style.border = '1px solid #ccc';
+                    container.style.background = '#f9f9f9';
+                    container.style.marginTop = '10px';
+                    document.body.appendChild(container);
+                }
+
+                // Build and inject the report content
+                var html = '🔍 XHR/Blob Compatibility Report:<br>';
+                for (var i = 0; i < lines.length; i++) {
+                    html += lines[i] + '<br>';
+                }
+                container.innerHTML = html;  // use innerHTML to render <br> tags
+            }
+            checkXHRBlobCompatibility();
+                
+        </script>
+    </body>
+</html>
