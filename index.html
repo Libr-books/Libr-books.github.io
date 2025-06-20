@@ -326,7 +326,7 @@ if (isCompatible()) {
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4) {
                 if (xhr.status === 200) {
-                    callback(null, xhr.responseText);
+                    callback(null, xhr);
                 } else {
                     callback(new Error("Request failed: " + xhr.statusText));
                 }
@@ -337,9 +337,9 @@ if (isCompatible()) {
 
     // Example raw data (JSON-like)
     var rawData = [];
-    get("./static/books.json", 'json', function(error, data) {
+    get("./static/books.json", '', function(error, data) {
         if (data) {
-            var rawBooks = JSON.parse(data);
+            var rawBooks = JSON.parse(data.responseText);
 
             // Map raw objects into Book instances with File instances inside
             rawData = rawBooks.map(function(rawBook) {
