@@ -433,7 +433,7 @@ if (isCompatible()) {
 
     var getMimeType = logs.wrap(function(file) {
         var ext = file.type.replace(/^\./, '').toLowerCase();
-        mimeTypes[ext] || 'application/octet-stream';
+        return mimeTypes[ext] || 'application/octet-stream';
     }, "getMimeType");
 
     function showErrorBox(message) {
