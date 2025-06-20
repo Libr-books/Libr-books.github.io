@@ -130,8 +130,8 @@
                     xhrSupported.innerHTML = '⚠️ Compatibility issues found: no supported xhr reponse types<br>';
                 } else { 
                     var html = '✅ Allowed XHR responset Type: <br>';
-                    for (var i = 0; i < lines.length; i++) {
-                        html += lines[i] + '<br>';
+                    for (var i = 0; i < xhrSupportedResponseTypes.length; i++) {
+                        html += xhrSupportedResponseTypes[i] + '<br>';
                     }
                     xhrSupported.innerHTML = html;
                 }
@@ -142,8 +142,8 @@
                     var xhrUnsupported = document.getElementById('xhrUnsupported');
                     xhrUnsupported.style.display = 'block'
                     var html = '⚠️ Compatibility issues found: Some XHR types not allowed <br>';
-                    for (var i = 0; i < lines.length; i++) {
-                        html += lines[i] + '<br>';
+                    for (var i = 0; i < xhrUnspportedResponseTypes.length; i++) {
+                        html += xhrUnspportedResponseTypes[i] + '<br>';
                     }
                     xhrUnsupported.innerHTML = html;
                 }
