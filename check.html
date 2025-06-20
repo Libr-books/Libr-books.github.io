@@ -23,7 +23,7 @@
             var report = [];
             var xhrSupportedResponseTypes = [];
             var xhrUnspportedResponseTypes = [];
-
+            try{    
             // Check core ES5 methods
             if (!Array.prototype.map) report.push('❌ Array.prototype.map not supported.');
             if (!Array.prototype.forEach) report.push('❌ Array.prototype.forEach not supported.');
@@ -101,6 +101,10 @@
             if (window.URL && typeof window.URL.createObjectURL === 'function') {               
             } else {
                 report.push('❌ URL.createObjectURL is NOT supported.');
+            }
+        }
+        catch (e) {
+                report.push('❌ Catestrphic failure: ' + e);
             }
 
               logReport(report, xhrSupportedResponseTypes, xhrUnspportedResponseTypes);
