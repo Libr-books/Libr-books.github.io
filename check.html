@@ -61,10 +61,10 @@
                 if (xhr.responseType === type) {
                     xhrSupportedResponseTypes.push('✅ responseType "' + type + '" is supported.');
                 } else {
-                    report.xhrUnspportedResponseTypes('❌ responseType "' + type + '" is NOT supported.');
+                    xhrUnspportedResponseTypes.push('❌ responseType "' + type + '" is NOT supported.');
                 }
                 } catch (e) {
-                report.xhrUnspportedResponseTypes('❌ Setting responseType "' + type + '" threw an error.');
+                    xhrUnspportedResponseTypes.push('❌ Setting responseType "' + type + '" threw an error.');
                 }
             }
 
