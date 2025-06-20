@@ -127,7 +127,7 @@
                 
                 var xhrSupported = document.getElementById('xhrSupported');
                 if (xhrSupportedResponseTypes.length === 0) {
-                        compatReport.innerHTML = '⚠️ Compatibility issues found: no supported xhr reponse types<br>';
+                    xhrSupported.innerHTML = '⚠️ Compatibility issues found: no supported xhr reponse types<br>';
                 } else { 
                     var html = '✅ Allowed XHR responset Type: <br>';
                     for (var i = 0; i < lines.length; i++) {
