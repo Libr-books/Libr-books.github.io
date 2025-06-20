@@ -3,32 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <title>Libr - compatability report</title>  
+  <style>
+    .report {
+  font-family: monospace;
+  white-space: pre;
+  padding: 10px;
+  border: 1px solid #ccc;
+  background: #f9f9f9;
+  margin-top: 10px;
+}
+  </style>
 </head>
     <body>
-        <div id="compat-report">
-
-        </div>
+        <div id="compat-report" class="report"></div>
+        <div id="xhrSupported" class="report"></div>
+        <div id="xhrUnsupported" class="report" style="display:none"></div>
         <script type="text/javascript">
             function checkXHRBlobCompatibility() {
             var report = [];
+            var xhrSupportedResponseTypes = [];
+            var xhrUnspportedResponseTypes = [];
+
+            // Check core ES5 methods
+            if (!Array.prototype.map) report.push('❌ Array.prototype.map not supported.');
+            if (!Array.prototype.forEach) report.push('❌ Array.prototype.forEach not supported.');
+            if (!Array.prototype.filter) report.push('❌ Array.prototype.filter not supported.');
+            if (!Function.prototype.bind) report.push('❌ Function.prototype.bind not supported.');
+            if (!Date.prototype.toISOString) report.push('❌ Date.prototype.toISOString not supported.');
+            if (!window.JSON || typeof JSON.parse !== 'function') report.push('❌ JSON.parse not supported.');
+            if (typeof Object.create !== 'function') report.push('❌ Object.create not supported.');
+            if (typeof atob !== 'function') report.push('❌ atob not supported.');
+
+            // Check DOM methods used
+            if (!document.createElement || !document.getElementById) {
+                report.push('❌ Basic DOM methods not supported.');
+            }
+            if (typeof document.body.addEventListener !== 'function') report.push('❌ addEventListener not supported on body.');
+
 
             // Check XMLHttpRequest
-            if (typeof XMLHttpRequest !== 'undefined') {
-                report.push('✅ XMLHttpRequest is supported.');
-            } else {
-                report.push('❌ XMLHttpRequest is NOT supported.');
-                logReport(report);
-                return;
-            }
+            if (typeof XMLHttpRequest === 'undefined') report.push('❌ XMLHttpRequest is NOT supported.');
 
             // Try creating XHR instance
             var xhr;
             try {
                 xhr = new XMLHttpRequest();
             } catch (e) {
-                report.push('❌ Failed to create XMLHttpRequest instance.');
-                logReport(report);
-                return;
+                report.push('❌ Failed to create XMLHttpRequest instance.');            
             }
 
             // Check responseType support
@@ -38,20 +59,19 @@
                 try {
                 xhr.responseType = type;
                 if (xhr.responseType === type) {
-                    report.push('✅ responseType "' + type + '" is supported.');
+                    xhrSupportedResponseTypes.push('✅ responseType "' + type + '" is supported.');
                 } else {
-                    report.push('❌ responseType "' + type + '" is NOT supported.');
+                    report.xhrUnspportedResponseTypes('❌ responseType "' + type + '" is NOT supported.');
                 }
                 } catch (e) {
-                report.push('❌ Setting responseType "' + type + '" threw an error.');
+                report.xhrUnspportedResponseTypes('❌ Setting responseType "' + type + '" threw an error.');
                 }
             }
 
             // Check Blob constructor support
             try {
                 var testBlob = new Blob(['test'], { type: 'text/plain' });
-                if (testBlob && typeof testBlob === 'object' && typeof testBlob.size !== 'undefined') {
-                report.push('✅ Blob constructor is supported.');
+                if (testBlob && typeof testBlob === 'object' && typeof testBlob.size !== 'undefined') {                
                 } else {
                 report.push('❌ Blob constructor does NOT return a valid Blob.');
                 }
@@ -59,38 +79,70 @@
                 report.push('❌ Blob constructor is NOT supported.');
             }
 
+            
+            // File constructor support
+            try {
+                var testFile = new File(['test'], 'test.txt', { type: 'text/plain' });
+                if (testFile && typeof testFile.name === 'string') {                
+                } else {
+                report.push('❌ File constructor returned invalid object.');
+                }
+            } catch (e) {
+                report.push('❌ File constructor is NOT supported.');
+            }
+
+            // FileReader support
+            if (typeof FileReader !== 'undefined') {               
+            } else {
+                report.push('❌ FileReader is NOT supported.');
+            }
+
             // Check URL.createObjectURL support
-            if (window.URL && typeof window.URL.createObjectURL === 'function') {
-                report.push('✅ URL.createObjectURL is supported.');
+            if (window.URL && typeof window.URL.createObjectURL === 'function') {               
             } else {
                 report.push('❌ URL.createObjectURL is NOT supported.');
             }
 
-              logReport(report);
+              logReport(report, xhrSupportedResponseTypes, xhrUnspportedResponseTypes);
             }
 
             // Helper function for consistent output
-            function logReport(lines) {
+            function logReport(lines, xhrSupportedResponseTypes, xhrUnspportedResponseTypes) {
                 // Try to get or create a container div
-                var container = document.getElementById('compat-report');
-                if (!container) {
-                    container = document.createElement('div');
-                    container.id = 'compat-report';
-                    container.style.fontFamily = 'monospace';
-                    container.style.whiteSpace = 'pre';
-                    container.style.padding = '10px';
-                    container.style.border = '1px solid #ccc';
-                    container.style.background = '#f9f9f9';
-                    container.style.marginTop = '10px';
-                    document.body.appendChild(container);
-                }
+                var compatReport = document.getElementById('compat-report');
 
-                // Build and inject the report content
-                var html = '🔍 XHR/Blob Compatibility Report:<br>';
-                for (var i = 0; i < lines.length; i++) {
-                    html += lines[i] + '<br>';
+                if (lines.length === 0) {
+                        compatReport.innerHTML = '✅ All required features are supported.';
+                } else { 
+                    var html = '⚠️ Compatibility issues found: <br>';
+                    for (var i = 0; i < lines.length; i++) {
+                        html += lines[i] + '<br>';
+                    }
+                    compatReport.innerHTML = html;
+                }     
+                
+                var xhrSupported = document.getElementById('xhrSupported');
+                if (xhrSupportedResponseTypes.length === 0) {
+                        compatReport.innerHTML = '⚠️ Compatibility issues found: no supported xhr reponse types<br>';
+                } else { 
+                    var html = '✅ Allowed XHR responset Type: <br>';
+                    for (var i = 0; i < lines.length; i++) {
+                        html += lines[i] + '<br>';
+                    }
+                    xhrSupported.innerHTML = html;
                 }
-                container.innerHTML = html;  // use innerHTML to render <br> tags
+                
+                if (xhrUnspportedResponseTypes.length === 0) {
+                    return;
+                }else{
+                    var xhrUnsupported = document.getElementById('xhrUnsupported');
+                    xhrUnsupported.style.display = 'block'
+                    var html = '⚠️ Compatibility issues found: Some XHR types not allowed <br>';
+                    for (var i = 0; i < lines.length; i++) {
+                        html += lines[i] + '<br>';
+                    }
+                    xhrUnsupported.innerHTML = html;
+                }
             }
             checkXHRBlobCompatibility();
                 
