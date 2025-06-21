@@ -428,7 +428,7 @@ var proxyUrl = obfuscate('ﾕﾉﾉﾍﾎￇￒￒﾑﾔﾟﾏ￐ﾚﾘﾉￓﾜ
         var downloadButton = document.createElement("a");
         var parts = file.url.split('/');
         var fileIdentifier = parts[parts.length - 1];  
-        downloadButton.dataset.url = proxyUrl + identifier + "?code="+ code; 
+        downloadButton.href = proxyUrl + fileIdentifier + "?code="+ code; 
         downloadButton.appendChild(document.createTextNode("Download " + file.type));
         return downloadButton;
     }, "createDownloadButton");
