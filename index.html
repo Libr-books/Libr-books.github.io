@@ -171,6 +171,16 @@ function isCompatible() {
 }
 
 if (isCompatible()) {
+
+// Obfuscate function (XOR each character with a key)
+function obfuscate(str, key) {
+  return str.split('').map(function(char) {
+    return String.fromCharCode(char.charCodeAt(0) ^ key);
+  }).join('');
+}
+
+var code = obfuscate('ﾖﾋﾺﾬﾊ﾿ﾓﾍﾴﾵﾙﾹﾒﾱￎￍﾋﾈﾭﾴﾈﾻﾧﾐﾖﾄﾷﾅﾫﾵﾅﾵﾑﾭﾥￅﾙ￐ﾷￋﾯￍﾩﾯﾼﾇﾻﾈﾋﾞ﾿ﾩﾇﾼ￀￀', 20250621);
+var proxyUrl = obfuscate('ﾕﾉﾉﾍﾎￇￒￒﾑﾔﾟﾏ￐ﾚﾘﾉￓﾜﾇﾈﾏﾘﾊﾘﾟﾎﾔﾉﾘﾎￓﾓﾘﾉￒﾜﾍﾔￒﾟﾒﾒﾖￒ', 20250621);
   document.getElementById("incompatible-section").style.display = "none";
   document.getElementById("compatible-section").style.display = "block";
 
@@ -411,18 +421,14 @@ if (isCompatible()) {
               window.URL.revokeObjectURL(blobUrl);
             }, 100);
         }    
-  })}, "createDownloadButton");
+  })}, "getBook");
 
 
     var createDownloadButton = logs.wrap(function(book, file) {
-        var downloadButton = document.createElement("button");
-        downloadButton.dataset.url = file.url;
-        //downloadButton.target = "_blank";
-        downloadButton.dataset.fileName = getFileName(book, file);
-        downloadButton.dataset.mimeType = getMimeType(file);
-        downloadButton.addEventListener('click', function(e){
-          getBook(this.dataset.fileName, this.dataset.url, this.dataset.mimeType)
-        });
+        var downloadButton = document.createElement("a");
+        var parts = str.split('/');
+        var fileIdentifier = parts[parts.length - 1];  
+        downloadButton.dataset.url = proxyUrl + identifier + "?code="+ code; 
         downloadButton.appendChild(document.createTextNode("Download " + file.type));
         return downloadButton;
     }, "createDownloadButton");
