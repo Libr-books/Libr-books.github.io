@@ -48,5 +48,19 @@
         "url": "./files/738f15d0-eef5-419c-99fa-4c8094c662ab"
       }
     ]
+  },
+  {
+    "name": "UHVja2luZyBBcm91bmQ=",
+    "author": "RW1pbHkgUmF0aA==",
+    "files": [
+      {
+        "type": ".kepub",
+        "url": "./files/6eafc83c-dddc-4929-bf2b-83f5bde8c35f"
+      },
+      {
+        "type": ".epub",
+        "url": "./files/dac48622-cf97-4961-bf0f-4fc13805b92b"
+      }
+    ]
   }
 ]
