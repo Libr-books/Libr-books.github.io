@@ -112,5 +112,65 @@
         "url": "./files/49b190da-0230-442a-a10c-052a2db3d2e0"
       }
     ]
+  },
+  {
+    "name": "QXNzYXNzaW4ncyBBcHByZW50aWNl",
+    "author": "Um9iaW4gSG9iYg==",
+    "files": [
+      {
+        "type": ".epub",
+        "url": "./files/04b644d4-548f-4872-bd74-52cb8048484b"
+      }
+    ]
+  },
+  {
+    "name": "Um95YWwgQXNzYXNzaW4=",
+    "author": "Um9iaW4gSG9iYg==",
+    "files": [
+      {
+        "type": ".epub",
+        "url": "./files/65494360-5483-44b4-b427-e0a5b9322ec3"
+      }
+    ]
+  },
+  {
+    "name": "QXNzYXNzaW4ncyBRdWVzdA==",
+    "author": "Um9iaW4gSG9iYg==",
+    "files": [
+      {
+        "type": ".epub",
+        "url": "./files/1e618d4a-ea6c-424a-a3ae-7da309d2a94d"
+      }
+    ]
+  },
+  {
+    "name": "Rm9vbCdzIEVycmFuZA==",
+    "author": "Um9iaW4gSG9iYg==",
+    "files": [
+      {
+        "type": ".epub",
+        "url": "./files/0f77727e-cf69-4f97-8edf-21063b9e48f1"
+      }
+    ]
+  },
+  {
+    "name": "VGhlIEdvbGRlbiBGb29s",
+    "author": "Um9iaW4gSG9iYg==",
+    "files": [
+      {
+        "type": ".epub",
+        "url": "./files/839f40e0-a1b7-49e3-b76c-24e0cf3f4e75"
+      }
+    ]
+  },
+  {
+    "name": "Rm9vbCdzIEZhdGU=",
+    "author": "Um9iaW4gSG9iYg==",
+    "files": [
+      {
+        "type": ".epub",
+        "url": "./files/0391c0e9-850e-4fcd-b845-63dfdb2cb7ea"
+      }
+    ]
   }
 ]
